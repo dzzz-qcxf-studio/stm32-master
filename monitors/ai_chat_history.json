@@ -1,0 +1,297 @@
+[
+  {
+    "role": "device",
+    "content": "22",
+    "timestamp": "2026-04-30T09:11:09.547Z",
+    "type": "received"
+  },
+  {
+    "role": "user",
+    "content": "12312",
+    "timestamp": "2026-04-30T09:11:13.545Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "device",
+    "content": "ok",
+    "timestamp": "2026-04-30T09:11:13.549Z",
+    "type": "received"
+  },
+  {
+    "role": "user",
+    "content": "12312",
+    "timestamp": "2026-04-30T09:11:19.032Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "device",
+    "content": "ok",
+    "timestamp": "2026-04-30T09:11:19.037Z",
+    "type": "received"
+  },
+  {
+    "role": "ai",
+    "content": "hello",
+    "timestamp": "2026-04-30T09:11:30.967Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "device",
+    "content": "ok",
+    "timestamp": "2026-04-30T09:11:30.971Z",
+    "type": "received"
+  },
+  {
+    "role": "ai",
+    "content": "hello",
+    "timestamp": "2026-04-30T09:11:30.973Z",
+    "type": "ai_message"
+  },
+  {
+    "role": "user",
+    "content": "123123",
+    "timestamp": "2026-04-30T09:15:13.183Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "213123",
+    "timestamp": "2026-04-30T09:15:54.188Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "123123123",
+    "timestamp": "2026-04-30T09:16:00.870Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "test message",
+    "timestamp": "2026-04-30T09:16:12.784Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "test message",
+    "timestamp": "2026-04-30T09:16:12.790Z",
+    "type": "ai_message"
+  },
+  {
+    "role": "user",
+    "content": "123123",
+    "timestamp": "2026-04-30T09:18:32.765Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "hello again",
+    "timestamp": "2026-04-30T09:18:51.011Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "123123",
+    "timestamp": "2026-04-30T09:19:18.027Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "hello",
+    "timestamp": "2026-04-30T09:20:39.105Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "hello",
+    "timestamp": "2026-04-30T09:22:52.827Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "1231",
+    "timestamp": "2026-04-30T09:23:32.556Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "1231",
+    "timestamp": "2026-04-30T09:24:02.020Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "1231",
+    "timestamp": "2026-04-30T09:24:37.521Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "123",
+    "timestamp": "2026-04-30T09:39:26.551Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "123",
+    "timestamp": "2026-04-30T09:49:52.535Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "bk",
+    "timestamp": "2026-04-30T09:52:52.619Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "hulkhn",
+    "timestamp": "2026-04-30T09:53:11.195Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "88",
+    "timestamp": "2026-04-30T09:53:59.800Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "66",
+    "timestamp": "2026-04-30T09:54:59.895Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "55",
+    "timestamp": "2026-04-30T09:55:36.982Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "22",
+    "timestamp": "2026-04-30T10:07:32.327Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "11",
+    "timestamp": "2026-04-30T10:23:05.474Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "22",
+    "timestamp": "2026-04-30T10:23:19.282Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "11",
+    "timestamp": "2026-04-30T10:27:20.198Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "22",
+    "timestamp": "2026-04-30T10:28:00.886Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "55",
+    "timestamp": "2026-04-30T10:32:35.958Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "2233",
+    "timestamp": "2026-04-30T10:35:33.035Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "223333",
+    "timestamp": "2026-04-30T10:36:15.692Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "22",
+    "timestamp": "2026-04-30T10:36:34.641Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "223333",
+    "timestamp": "2026-04-30T10:41:07.365Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "22211",
+    "timestamp": "2026-04-30T10:55:33.384Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "user",
+    "content": "12312",
+    "timestamp": "2026-04-30T10:55:40.521Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "22",
+    "timestamp": "2026-04-30T10:56:03.161Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "222",
+    "timestamp": "2026-04-30T11:21:27.694Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "555",
+    "timestamp": "2026-04-30T11:21:41.414Z",
+    "type": "sent",
+    "isHex": false
+  }
+]

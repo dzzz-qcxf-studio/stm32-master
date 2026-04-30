@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "serialport": "^13.0.0",
     "ws": "^8.20.0"
   }

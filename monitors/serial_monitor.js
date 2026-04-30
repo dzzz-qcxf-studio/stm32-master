@@ -1,6 +1,5 @@
 const { SerialPort } = require('serialport');
 const http = require('http');
-const url = require('url');
 const { WebSocketServer } = require('ws');
 
 let DEFAULT_PORT = 'COM5';
@@ -159,7 +158,7 @@ function listPorts() {
 
 // Simple Web Server
 const server = http.createServer(async (req, res) => {
-    const parsedUrl = url.parse(req.url, true);
+    const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}/`);
 
     if (parsedUrl.pathname === '/ports') {
         // API endpoint to list ports
@@ -171,8 +170,8 @@ const server = http.createServer(async (req, res) => {
 
     if (parsedUrl.pathname === '/connect') {
         // Connect to a port
-        const port = parsedUrl.query['port'];
-        const baud = parseInt(parsedUrl.query['baud']) || 115200;
+        const port = parsedUrl.searchParams.get('port');
+        const baud = parseInt(parsedUrl.searchParams.get('baud')) || 115200;
         openSerialPort(port, baud);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
@@ -198,8 +197,8 @@ const server = http.createServer(async (req, res) => {
     if (parsedUrl.pathname === '/send') {
         // Send data (plain or hex)
         if (serialPort && serialPort.isOpen) {
-            let data = parsedUrl.query['data'] || '';
-            const isHex = parsedUrl.query['hex'] === '1';
+            let data = parsedUrl.searchParams.get('data') || '';
+            const isHex = parsedUrl.searchParams.get('hex') === '1';
 
             let buffer;
             if (isHex) {

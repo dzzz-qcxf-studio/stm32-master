@@ -26,15 +26,16 @@ stm32_master/
 │   ├── start_debug.ps1       # 启动调试会话
 │   └── check_gpio_safety.ps1 # GPIO 引脚安全检查 ⚠️
 ├── monitors/           # 串口监控工具
-│   ├── monitor_web.ps1       # Web UI 模式（PowerShell）
-│   ├── monitor_serial.ps1    # 命令行模式（PowerShell）
-│   ├── monitor_websocket.ps1 # WebSocket 模式
-│   ├── serial_monitor.js     # Node.js 串口服务（Web UI）
+│   ├── monitor_web.ps1       # Web UI 启动脚本（PowerShell）
+│   ├── monitor_serial.ps1    # 命令行监控（PowerShell）
+│   ├── serial_monitor.js     # 基础版 Web UI
+│   ├── serial_monitor_ai.js  # AI 增强版 Web UI（主用）
+│   ├── serial_mcp.js         # MCP 服务器（可选）
 │   ├── package.json          # Node.js 依赖配置
 │   └── node_modules/         # Node.js 依赖包
 ├── docs/               # 文档
-│   ├── FILES_MANIFEST.md     # 文件清单
-│   ├── MONITOR_QUICKSTART.md # 监控快速入门
+│   ├── MONITOR_QUICKSTART.md # 串口监控快速入门
+│   ├── MCP_CONFIG.md        # MCP 配置说明
 │   └── PROJECT_SUMMARY.md    # 项目概述
 ├── templates/          # 代码模板
 │   ├── fal_module.h/.c       # FAL 模块框架
@@ -47,7 +48,6 @@ stm32_master/
 │   ├── device_can.c          # CAN 驱动
 │   ├── .clang-format.tmpl    # 代码格式化配置
 │   └── vscode_launch.json.tmpl # VSCode 调试配置
-└── vscode-extension/   # VS Code 扩展
 ```
 
 ---
@@ -216,157 +216,35 @@ cmake --build <project>/build --config Debug
 
 ## monitor - 串口实时监控
 
-### 功能说明
+### MCP 工具（推荐方式）
 
-实时读取 STM32 设备的串口数据，提供三种监控方式：
-1. **VS Code 扩展** - 集成在编辑器中
-2. **Web UI 模式** - 独立浏览器界面
-3. **命令行模式** - 脚本集成用
+AI 使用 MCP 工具直接控制串口，无需手动启动服务：
 
----
+| 工具 | 参数 | 说明 |
+|------|------|------|
+| `serial_list_ports` | - | 列出可用串口 |
+| `serial_connect` | `port`, `baudRate` | 连接串口 |
+| `serial_send` | `command` | 发送命令 |
+| `serial_history` | - | 获取对话历史 |
+| `serial_status` | - | 获取连接状态 |
 
-### 方式一：VS Code 扩展
-
-**安装：**
-
-```powershell
-cd vscode-extension
-setup.bat
+**示例**：连接 COM11 并发送 "123"
+```
+serial_connect(port="COM11", baudRate=115200)
+serial_send(command="123")
 ```
 
-**使用：**
+### Web UI（备用）
 
-1. 重启 VS Code
-2. 点击左侧活动栏的串口图标
-3. 点击"Select"选择 COM 端口
-4. 点击"Start"开始监控
-
-**功能：**
-
-| 功能 | 说明 |
-|------|------|
-| 实时显示 | 在 VS Code 侧边栏显示串口数据 |
-| 智能过滤 | 支持正则表达式过滤 |
-| 智能着色 | 自动识别 ERROR/WARN/SUCCESS |
-| 统计信息 | 显示行数和字节数 |
-| 日志导出 | 导出为文本文件 |
-
-**快捷命令（Ctrl+Shift+P）：**
-
-- `STM32: Start Monitoring` - 启动
-- `STM32: Stop Monitoring` - 停止
-- `STM32: Clear Output` - 清空
-- `STM32: Download Log` - 下载
-- `STM32: Select COM Port` - 选择端口
-
----
-
-### 方式二：Web UI 模式（推荐）
-
-直接运行 Node.js 脚本，自动检测端口并打开浏览器：
-
+启动后访问 http://localhost:8080
 ```bash
-# 默认方式（自动选择端口，打开浏览器）
-node monitors/serial_monitor.js
-
-# 指定端口和波特率
-node monitors/serial_monitor.js COM5 115200 8080
-
-# 或使用命名参数
-node monitors/serial_monitor.js --serial COM5 --baud 115200 --port 8080
+node monitors/serial_monitor_ai.js --serial COM5 --baud 115200 --port 8080
 ```
 
-Web UI 功能：
-
-| 功能 | 说明 |
-|------|------|
-| 端口选择 | 下拉菜单选择 COM 端口，带刷新按钮 |
-| 波特率 | 9600-921600 可选 |
-| 手动发送 | 输入框 + 发送按钮，支持回车键发送 |
-| 清空/下载 | 清空控制台，下载日志文件 |
-| 统计信息 | 实时显示数据行数和字节数 |
-| 智能着色 | 自动识别 ERROR/WARN/SUCCESS/INFO/DEBUG |
-
-### 方式三：WebSocket 模式
+### 命令行（备用）
 
 ```powershell
-# 使用 WebSocket 推送串口数据
-.\monitors\monitor_websocket.ps1 -SerialPort "COM3" -BaudRate 115200
-```
-
-### 方式四：命令行模式
-
-```powershell
-# 自动检测 COM 端口，保存日志
-.\monitors\monitor_serial.ps1 -LogFile "serial.log"
-
-# 指定端口和波特率
-.\monitors\monitor_serial.ps1 -Port "COM3" -BaudRate 9600 -LogFile "debug.log"
-
-# 只显示包含特定关键词的行
-.\monitors\monitor_serial.ps1 -Port "COM3" -Filter "ERROR|WARNING|\[.*\]"
-
-# 监控 5 分钟后自动停止
-.\monitors\monitor_serial.ps1 -Port "COM3" -Duration 300
-```
-
-### 参数说明
-
-#### monitor_web.ps1
-
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `-Port` | int | 8080 | Web 服务器端口 |
-| `-SerialPort` | string | 自动检测 | COM 端口号 |
-| `-BaudRate` | int | 115200 | 波特率 |
-| `-OpenBrowser` | switch | $true | 自动打开浏览器 |
-
-#### monitor_serial.ps1
-
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `-Port` | string | 自动检测 | COM 端口号 |
-| `-BaudRate` | int | 115200 | 波特率 |
-| `-DataBits` | int | 8 | 数据位数 |
-| `-StopBits` | object | 1 | 停止位 |
-| `-Parity` | string | None | 奇偶校验 |
-| `-Timeout` | int | 1000 | 读取超时（毫秒） |
-| `-Duration` | int | 0 | 监控时长（秒，0 = 无限） |
-| `-LogFile` | string | 无 | 日志文件保存路径 |
-| `-Filter` | string | 无 | 正则表达式过滤 |
-
-### 硬编码提示
-
-> **serial_monitor.js 默认值：**
-> - 串口：`COM5`
-> - Web 端口：`8080`
->
-> 如需修改，直接编辑 `monitors/serial_monitor.js` 或使用 `monitor_web.ps1` 脚本（支持参数）
-
-### 使用示例
-
-#### 示例1：调试固件启动信息
-
-```powershell
-.\monitors\monitor_web.ps1 -SerialPort "COM3" -BaudRate 115200
-```
-
-#### 示例2：集成到 CI/CD，检测错误
-
-```powershell
-# 监控 30 秒，过滤 ERROR 信息
-.\monitors\monitor_serial.ps1 -Port "COM3" `
-                    -Duration 30 `
-                    -Filter "ERROR|FAIL|Exception" `
-                    -LogFile "test_results.log"
-
-# 检查日志中是否包含错误
-if (Select-String -Path "test_results.log" -Pattern "ERROR" -Quiet) {
-    Write-Host "❌ 测试失败！"
-    exit 1
-} else {
-    Write-Host "✅ 测试通过！"
-}
+.\monitors\monitor_serial.ps1 -Port "COM5" -LogFile "debug.log"
 ```
 
 ### 常见问题

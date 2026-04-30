@@ -32,7 +32,6 @@ stm32_master/
 │   ├── device_can.c          # CAN 驱动
 │   ├── .clang-format.tmpl    # 代码格式化配置
 │   └── vscode_launch.json.tmpl # VSCode 调试配置
-└── vscode-extension/   # VS Code 扩展
 ```
 
 ## 工作流程图
@@ -75,14 +74,10 @@ flowchart TD
 ```mermaid
 flowchart LR
     A[STM32 设备] --> B{选择监控方式}
-    B --> C[VS Code 扩展]
     B --> D[Web UI 模式]
-    B --> E[WebSocket 模式]
-    B --> F[命令行模式]
-    C --> G[点击图标启动]
-    D --> H[自动打开浏览器]
-    E --> I[实时数据推送]
-    F --> J[保存日志文件]
+    B --> E[命令行模式]
+    D --> G[自动打开浏览器<br/>WebSocket 推送数据]
+    E --> H[保存日志文件]
 ```
 
 ## 快速开始
@@ -108,24 +103,36 @@ flowchart LR
 .\scripts\start_debug.ps1 -ProjectDir "F:\path\to" -Shell     # 串口 Shell
 ```
 
-### 串口实时监控
+### 串口监控（MCP 工具 - 推荐）
 
-#### 方式1：VS Code 扩展
-```powershell
-cd vscode-extension
-setup.bat
+AI 可直接使用 MCP 工具控制串口：
+
+| 工具 | 参数 | 说明 |
+|------|------|------|
+| `serial_list_ports` | - | 列出可用串口 |
+| `serial_connect` | `port`, `baudRate` | 连接串口 |
+| `serial_send` | `command` | 发送命令 |
+| `serial_history` | - | 获取对话历史 |
+| `serial_status` | - | 获取连接状态 |
+
+**示例**：连接 COM11 并发送 "123"
+```
+serial_connect(port="COM11", baudRate=115200)
+serial_send(command="123")
 ```
 
-#### 方式2：Web UI 模式
+### Web UI（备用）
+
 ```powershell
-.\monitors\monitor_web.ps1 -SerialPort "COM3"
+# 启动 Web UI
+node monitors/serial_monitor_ai.js --serial COM5 --baud 115200 --port 8080
 ```
+访问 http://localhost:8080
 
-Web UI 功能：端口选择、波特率选择（9600-921600）、手动发送、回车键发送、清空、下载日志。
+### 命令行（备用）
 
-#### 方式3：命令行模式
 ```powershell
-.\monitors\monitor_serial.ps1 -Port "COM3" -LogFile "debug.log"
+.\monitors\monitor_serial.ps1 -Port "COM5" -LogFile "debug.log"
 ```
 
 ## 硬编码路径提示
