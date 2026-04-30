@@ -6,17 +6,33 @@
 
 ```
 stm32_master/
-├── scripts/          # 编译、烧录、调试脚本
-│   ├── build_flash.ps1
-│   ├── start_debug.ps1
-│   └── check_gpio_safety.ps1  # GPIO 安全检查
-├── monitors/         # 串口监控工具
-│   ├── monitor_web.ps1
-│   ├── monitor_serial.ps1
-│   └── serial_monitor.js
-├── docs/             # 文档
-├── templates/        # 代码模板
-└── vscode-extension/ # VS Code 扩展
+├── scripts/            # 编译、烧录、调试脚本
+│   ├── build_flash.ps1       # 一键编译+烧录
+│   ├── start_debug.ps1       # 启动调试会话
+│   └── check_gpio_safety.ps1 # GPIO 引脚安全检查
+├── monitors/           # 串口监控工具
+│   ├── monitor_web.ps1       # Web UI 模式（PowerShell）
+│   ├── monitor_serial.ps1    # 命令行模式（PowerShell）
+│   ├── monitor_websocket.ps1 # WebSocket 模式
+│   ├── serial_monitor.js     # Node.js 串口服务（Web UI）
+│   ├── package.json          # Node.js 依赖配置
+│   └── node_modules/         # Node.js 依赖包
+├── docs/               # 文档
+│   ├── FILES_MANIFEST.md     # 文件清单
+│   ├── MONITOR_QUICKSTART.md # 监控快速入门
+│   └── PROJECT_SUMMARY.md    # 项目概述
+├── templates/          # 代码模板
+│   ├── fal_module.h/.c       # FAL 模块框架
+│   ├── device_uart.c         # UART 驱动
+│   ├── device_iic.c          # I2C 驱动
+│   ├── device_spi.c          # SPI 驱动
+│   ├── device_gpio.c         # GPIO 驱动
+│   ├── device_adc.c          # ADC 驱动
+│   ├── device_tim.c          # 定时器/PWM 驱动
+│   ├── device_can.c          # CAN 驱动
+│   ├── .clang-format.tmpl    # 代码格式化配置
+│   └── vscode_launch.json.tmpl # VSCode 调试配置
+└── vscode-extension/   # VS Code 扩展
 ```
 
 ## 工作流程图
@@ -61,10 +77,12 @@ flowchart LR
     A[STM32 设备] --> B{选择监控方式}
     B --> C[VS Code 扩展]
     B --> D[Web UI 模式]
-    B --> E[命令行模式]
-    C --> F[点击图标启动]
-    D --> G[自动打开浏览器]
-    E --> H[保存日志文件]
+    B --> E[WebSocket 模式]
+    B --> F[命令行模式]
+    C --> G[点击图标启动]
+    D --> H[自动打开浏览器]
+    E --> I[实时数据推送]
+    F --> J[保存日志文件]
 ```
 
 ## 快速开始
