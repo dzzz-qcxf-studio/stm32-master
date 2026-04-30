@@ -105,15 +105,64 @@ flowchart LR
 
 ### 串口监控（MCP 工具 - 推荐）
 
-AI 可直接使用 MCP 工具控制串口：
+AI 可直接使用 MCP 工具控制串口，无需手动操作。
+
+#### MCP 服务端 (serial_monitor_ai.js)
+
+MCP 服务端同时提供 HTTP API 和 WebSocket 服务：
+
+```
+node monitors/serial_monitor_ai.js --serial COM11 --baud 115200 --port 8080
+```
+
+| 功能 | 说明 |
+|------|------|
+| Web UI | 浏览器访问 http://localhost:8080 |
+| HTTP API | /api/send, /api/connect, /api/ports |
+| WebSocket | 实时推送串口数据、AI 消息、设备响应 |
+| 消息历史 | 自动保存到 ai_chat_history.json |
+
+#### MCP 客户端工具
 
 | 工具 | 参数 | 说明 |
 |------|------|------|
 | `serial_list_ports` | - | 列出可用串口 |
 | `serial_connect` | `port`, `baudRate` | 连接串口 |
 | `serial_send` | `command` | 发送命令 |
+| `serial_disconnect` | - | 断开连接 |
 | `serial_history` | - | 获取对话历史 |
 | `serial_status` | - | 获取连接状态 |
+
+#### AI 消息显示机制
+
+当 AI 通过 MCP 发送消息时：
+1. 消息保存到 `aiChatHistory` 数组
+2. 通过 WebSocket 广播 `ai_message` 类型事件
+3. 网页前端接收并显示在 AI 栏
+
+消息数据结构：
+```json
+{
+  "type": "ai_message",
+  "role": "ai",
+  "content": "命令内容",
+  "timestamp": "ISO时间",
+  "isHex": false
+}
+```
+
+#### 手动运行 MCP 服务
+
+```bash
+# 进入目录
+cd monitors
+
+# 启动 MCP 服务（自动连接 COM11）
+node serial_monitor_ai.js --serial COM11 --baud 115200 --port 8080
+
+# 查看帮助
+node serial_monitor_ai.js --help
+```
 
 **示例**：连接 COM11 并发送 "123"
 ```
