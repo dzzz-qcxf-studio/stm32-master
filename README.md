@@ -32,6 +32,8 @@ AI 直接通过 MCP 协议控制串口，实时收发数据
 ### 📊 Web UI 监控
 浏览器可视化串口数据，支持 WebSocket 实时推送
 
+![alt text](image-1.png)
+
 ---
 
 ## 快速开始
