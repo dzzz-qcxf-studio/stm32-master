@@ -60,6 +60,7 @@ let connected = false;
 const MAX_CHAT_HISTORY = 200;
 let aiChatHistory = [];
 const CHAT_HISTORY_FILE = 'ai_chat_history.json';
+let chatHistoryFileWatcher = null;
 
 // Serial log buffer (for serial console - 不需要持久化)
 const MAX_SERIAL_LOG = 500;
@@ -90,8 +91,35 @@ function saveChatHistory() {
     }
 }
 
+// Watch chat history file for external changes (e.g., MCP modifications)
+function setupChatHistoryWatcher() {
+    const fs = require('fs');
+    let lastModified = 0;
+
+    try {
+        const stats = fs.statSync(CHAT_HISTORY_FILE);
+        lastModified = stats.mtimeMs;
+    } catch {}
+
+    chatHistoryFileWatcher = setInterval(() => {
+        try {
+            const stats = fs.statSync(CHAT_HISTORY_FILE);
+            if (stats.mtimeMs > lastModified) {
+                lastModified = stats.mtimeMs;
+                console.log('[History] File changed externally, reloading...');
+                loadChatHistory();
+                broadcastToAll({
+                    type: 'chat_history_reload',
+                    history: aiChatHistory
+                });
+            }
+        } catch {}
+    }, 1000);
+}
+
 // Initialize: load existing history
 loadChatHistory();
+setupChatHistoryWatcher();
 
 // Serial port setup
 function openSerialPort(port, baudRate) {
@@ -1313,6 +1341,10 @@ function getHtml() {
                     // Device response - show in AI chat panel
                     addChatMessage('device', data.content);
                     break;
+                case 'chat_history_reload':
+                    // External change detected, reload the chat panel
+                    reloadChatHistory(data.history);
+                    break;
             }
         }
 
@@ -1491,6 +1523,28 @@ function getHtml() {
                     });
                     if (history.length > 0) scroll.scrollTop = scroll.scrollHeight;
                 });
+        }
+
+function clearChatHistory() {
+            localStorage.removeItem('aiChatHistory');
+        }
+
+        function reloadChatHistory(history) {
+            const scroll = document.getElementById('chatScroll');
+            // Clear current display (keep API card at top)
+            const apiCard = scroll.querySelector('.api-card');
+            scroll.innerHTML = '';
+            if (apiCard) scroll.appendChild(apiCard);
+
+            // Render all messages from history
+            history.forEach(item => {
+                const msg = document.createElement('div');
+                msg.className = 'message ' + (item.role || 'user');
+                const time = item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : '';
+                msg.innerHTML = '<div>' + escapeHtml(item.content) + '</div><div class="message-time">' + time + '</div>';
+                scroll.appendChild(msg);
+            });
+            scroll.scrollTop = scroll.scrollHeight;
         }
 
         function clearChatHistory() {
@@ -1673,6 +1727,7 @@ startServer();
 
 process.on('SIGINT', () => {
     console.log('\nShutting down...');
+    if (chatHistoryFileWatcher) clearInterval(chatHistoryFileWatcher);
     if (serialPort) serialPort.close();
     process.exit();
 });

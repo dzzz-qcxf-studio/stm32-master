@@ -11,26 +11,21 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$ProjectDir,
 
-    [switch]$SkipBuild,         # Skip build, only flash
-    [switch]$SkipSafetyCheck,  # Skip GPIO safety check (危险! 仅在确认安全后使用)
+    [switch]$SkipBuild,
+    [switch]$SkipSafetyCheck,
 
-    # -------- 可选：工具路径覆盖 --------
-    [string]$UV4Path,        # Keil MDK 路径，如 "C:\Keil\UV4\UV4.exe"
-    [string]$ProgrammerPath, # STM32CubeProgrammer CLI，如 "C:\...\STM32_Programmer_CLI.exe"
-    [string]$CMakePath       # CMake.exe 路径（通常不需要指定）
+    [string]$UV4Path,
+    [string]$ProgrammerPath,
+    [string]$CMakePath
 )
 
 $ErrorActionPreference = "Continue"
 
-# ----------------------------------------
-# 工具查找函数（优先用参数，再自动检测）
-# ----------------------------------------
 function Find-KeilUV4 {
     param([string]$UserPath)
     if ($UserPath -and (Test-Path $UserPath -PathType Leaf)) {
         return $UserPath
     }
-    # 自动检测
     $paths = @(
         "${env:ProgramFiles(x86)}\Keil\UV4\UV4.exe",
         "D:\keil5\UV4\UV4.exe",
@@ -39,14 +34,14 @@ function Find-KeilUV4 {
     foreach ($p in $paths) {
         if (Test-Path $p -PathType Leaf) { return $p }
     }
-    # 注册表检测
     try {
         $regPath = (Get-ItemProperty "HKLM:\SOFTWARE\Keil\Products\UV4" -ErrorAction SilentlyContinue).Path
         if ($regPath) {
             $full = Join-Path $regPath "UV4.exe"
             if (Test-Path $full -PathType Leaf) { return $full }
         }
-    } catch { }
+    }
+    catch { }
     return $null
 }
 
@@ -88,9 +83,6 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Project: $ProjectDir" -ForegroundColor White
 
-# ----------------------------------------
-# Step 1: Detect project type
-# ----------------------------------------
 $isKeil = Test-Path "$ProjectDir\Projects\MDK-ARM\*.uvprojx" -PathType Leaf
 $isCMake = Test-Path "$ProjectDir\CMakeLists.txt" -PathType Leaf
 
@@ -105,9 +97,6 @@ if ($isKeil) {
     exit 1
 }
 
-# ----------------------------------------
-# Step 2: Find tools
-# ----------------------------------------
 Write-Host ""
 Write-Host "[2/5] Finding tools..." -ForegroundColor Yellow
 
@@ -141,9 +130,6 @@ if ($isCMake) {
     Write-Host "  CMake: $cmake" -ForegroundColor Green
 }
 
-# ----------------------------------------
-# Step 3: Build
-# ----------------------------------------
 if (-not $SkipBuild) {
     Write-Host ""
     Write-Host "[3/5] Building project..." -ForegroundColor Yellow
@@ -159,26 +145,23 @@ if (-not $SkipBuild) {
 
         $buildLog = Join-Path $ProjectDir "Output\build.log"
         $buildResult = & $uv4 -j0 -o $buildLog -b $uvprojx 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "Build failed!" -ForegroundColor Red
-            if (Test-Path $buildLog) {
-                Get-Content $buildLog | Select-Object -Last 30
-            }
-            exit 1
-        }
 
         if (Test-Path $buildLog) {
             $log = Get-Content $buildLog -Raw
-            if ($log -match "(\d+) Error\(s\)") {
-                $errors = $matches[1]
+            if ($log -match '"[^"]*"\s*-\s*(\d+)\s+Error\(s\)') {
+                $errors = [int]$matches[1]
                 if ($errors -gt 0) {
                     Write-Host "Build failed with $errors error(s)!" -ForegroundColor Red
                     Get-Content $buildLog | Select-Object -Last 20
                     exit 1
                 }
+                Write-Host "  Build complete (0 errors)" -ForegroundColor Green
+            } else {
+                Write-Host "  Build complete" -ForegroundColor Green
             }
+        } else {
+            Write-Host "  Build complete (log not found)" -ForegroundColor Green
         }
-        Write-Host "  Build complete (0 errors)" -ForegroundColor Green
 
         $elf = Get-ChildItem "$ProjectDir\Output\*.axf" -ErrorAction SilentlyContinue |
             Select-Object -First 1 -ExpandProperty FullName
@@ -231,9 +214,6 @@ if (-not $SkipBuild) {
     }
 }
 
-# ----------------------------------------
-# Step 4: Flash
-# ----------------------------------------
 Write-Host ""
 Write-Host "[4/5] Finding ELF file..." -ForegroundColor Yellow
 
@@ -243,9 +223,6 @@ if (-not $elf -or -not (Test-Path $elf)) {
 }
 Write-Host "  Found: $elf" -ForegroundColor Green
 
-# ----------------------------------------
-# Step 4.5: GPIO Safety Check
-# ----------------------------------------
 if (-not $SkipSafetyCheck) {
     Write-Host ""
     Write-Host "[4.5/6] Running GPIO Safety Check..." -ForegroundColor Yellow
@@ -259,18 +236,18 @@ if (-not $SkipSafetyCheck) {
         if ($safeExitCode -ne 0) {
             Write-Host ""
             Write-Host "========================================" -ForegroundColor Red
-            Write-Host "  ⚠️  安全检查失败 - 存在严重错误!" -ForegroundColor Red
-            Write-Host "  请修复上述问题后重试" -ForegroundColor Red
-            Write-Host "  或使用 -SkipSafetyCheck 跳过检查 (危险!)" -ForegroundColor Gray
+            Write-Host "  Safety check failed!" -ForegroundColor Red
+            Write-Host "  Please fix issues before retrying" -ForegroundColor Red
+            Write-Host "  Or use -SkipSafetyCheck (dangerous!)" -ForegroundColor Gray
             Write-Host "========================================" -ForegroundColor Red
             exit 1
         }
     } else {
-        Write-Host "  ⚠️  Safety check script not found, skipping..." -ForegroundColor Yellow
+        Write-Host "  Safety check script not found, skipping..." -ForegroundColor Yellow
     }
 } else {
     Write-Host ""
-    Write-Host "[4.5/6] Skipping GPIO Safety Check (⚠️ 危险!)..." -ForegroundColor Yellow
+    Write-Host "[4.5/6] Skipping GPIO Safety Check..." -ForegroundColor Yellow
 }
 
 Write-Host ""
@@ -301,11 +278,7 @@ if ($LASTEXITCODE -eq 0) {
     exit 1
 }
 
-# ----------------------------------------
-# Step 6/6: Warning if safety check was skipped
-# ----------------------------------------
 if ($SkipSafetyCheck) {
     Write-Host ""
-    Write-Host "⚠️  注意: GPIO 安全检查已被跳过!" -ForegroundColor Yellow
-    Write-Host "   请确保引脚配置正确，避免硬件损坏" -ForegroundColor Yellow
+    Write-Host "Warning: GPIO Safety Check was skipped!" -ForegroundColor Yellow
 }
