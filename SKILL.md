@@ -1,5 +1,5 @@
 ---
-name: stm32-build-flash
+name: stm32-master
 description: Use when compiling any STM32 project via CMake/Ninja or Keil MDK, flashing firmware via STM32CubeProgrammer CLI, debugging via ST-Link GDB Server, monitoring serial port output with Web UI, or using RTT Viewer, serial shell, code formatting, and static lint for STM32 devices.
 ---
 

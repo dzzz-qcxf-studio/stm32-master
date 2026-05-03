@@ -33,5 +33,19 @@
     "timestamp": "2026-05-01T10:17:31.892Z",
     "type": "sent",
     "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "2222",
+    "timestamp": "2026-05-01T10:27:55.742Z",
+    "type": "sent",
+    "isHex": false
+  },
+  {
+    "role": "ai",
+    "content": "6566",
+    "timestamp": "2026-05-01T11:44:07.271Z",
+    "type": "sent",
+    "isHex": false
   }
 ]
